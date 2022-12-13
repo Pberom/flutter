@@ -14,14 +14,14 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     currentMode = ThemeMode.system;
     SharedPreferences.getInstance().then((value) {
-      if (value.containsKey("isWhite")) {
+      if (value.containsKey("themeLight")) {
         setState(() {
           currentMode =
-              value.getBool("isWhite")! ? ThemeMode.light : ThemeMode.dark;
+              value.getBool("themeLight")! ? ThemeMode.light : ThemeMode.dark;
         });
       } else {
         value.setBool(
-            "isWhite", Theme.of(context).brightness == Brightness.light);
+            "themeLight", Theme.of(context).brightness == Brightness.light);
       }
     });
     super.initState();
@@ -30,24 +30,18 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Material App',
       themeMode: currentMode,
       darkTheme: ThemeData.dark(),
       theme: ThemeData.light(),
       home: Scaffold(
-        appBar: AppBar(
-          title: Text('Material App Bar'),
-        ),
-        body: Center(
-          child: FirstScreen(
-            changeTheme: (themeMode) => setState(() {
-              currentMode = themeMode;
-              SharedPreferences.getInstance().then((value) {
-                value.setBool("isWhite", currentMode == ThemeMode.light);
-              });
-            }),
-          ),
-        ),
+        body: FirstScreen(changeTheme: (themeMode) {
+          setState(() {
+            currentMode = themeMode;
+            SharedPreferences.getInstance().then((value) {
+              value.setBool("themeLight", currentMode == ThemeMode.light);
+            });
+          });
+        }),
       ),
     );
   }
@@ -61,11 +55,10 @@ class FirstScreen extends StatefulWidget {
 }
 
 class _FirstScreenState extends State<FirstScreen> {
-  late TextEditingController controller;
+  TextEditingController controller = TextEditingController();
 
   @override
   void initState() {
-    controller = TextEditingController();
     SharedPreferences.getInstance().then((value) {
       if (value.containsKey("value")) {
         Navigator.push(
@@ -84,17 +77,23 @@ class _FirstScreenState extends State<FirstScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-          onPressed: () => widget.changeTheme(
-              Theme.of(context).brightness == Brightness.light
-                  ? ThemeMode.dark
-                  : ThemeMode.light)),
+      floatingActionButton: ElevatedButton(
+          child: Icon(Icons.accessible),
+          onPressed: () {
+            widget.changeTheme(Theme.of(context).brightness == Brightness.light
+                ? ThemeMode.dark
+                : ThemeMode.light);
+          }),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
             SizedBox(
-              height: 20,
+              height: 120,
+              child: Icon(Icons.accessible_forward_rounded),
+            ),
+            SizedBox(
+              height: 40,
               child: TextField(
                 controller: controller,
               ),
@@ -115,7 +114,7 @@ class _FirstScreenState extends State<FirstScreen> {
                         settings: RouteSettings(arguments: controller.text)),
                   );
                 },
-                child: Text("Переход"))
+                child: Text("Перекат"))
           ],
         ),
       ),
@@ -134,14 +133,14 @@ class _SecondScreenState extends State<SecondScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-          onPressed: () => widget.changeTheme(
-              Theme.of(context).brightness == Brightness.light
-                  ? ThemeMode.dark
-                  : ThemeMode.light)),
-      body: Center(
-          child: Text(
-              (ModalRoute.of(context)?.settings.arguments as String?) ?? "")),
-    );
+        floatingActionButton: ElevatedButton(
+            child: Icon(Icons.accessible_sharp),
+            onPressed: () => widget.changeTheme(
+                Theme.of(context).brightness == Brightness.light
+                    ? ThemeMode.dark
+                    : ThemeMode.light)),
+        body: Center(
+            child:
+                Text((ModalRoute.of(context)?.settings.arguments as String))));
   }
 }
